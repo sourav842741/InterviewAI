@@ -18,6 +18,11 @@ app.use(cors({
 app.use(express.json())
 app.use(cookieParser())
 
+// ================= HEALTH CHECK =================
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
 app.use("/api/auth" , authRouter)
 app.use("/api/user", userRouter)
 app.use("/api/interview" , interviewRouter)
