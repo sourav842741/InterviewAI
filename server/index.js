@@ -1,5 +1,6 @@
 import express from "express"
 import dotenv from "dotenv"
+import mongoose from "mongoose";
 import connectDb from "./config/connectDb.js"
 import cookieParser from "cookie-parser"
 dotenv.config()
@@ -19,8 +20,27 @@ app.use(express.json())
 app.use(cookieParser())
 
 // ================= HEALTH CHECK =================
-app.get("/api/health", (req, res) => {
-  res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
+app.get("/api/health", async (req, res) => {
+  try {
+
+    // MongoDB ping
+    await mongoose.connection.db.admin().ping();
+
+    res.status(200).json({
+      status: "ok",
+      db: "connected",
+      timestamp: new Date().toISOString(),
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      status: "error",
+      db: "disconnected",
+      error: error.message,
+    });
+
+  }
 });
 
 app.use("/api/auth" , authRouter)
